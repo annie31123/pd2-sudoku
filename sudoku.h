@@ -3,8 +3,6 @@ class Sudoku{
     public:
         Sudoku();
         void CreateSudoku();
-
-        void setMap();
         void GiveQuestion();
         void ReadIn();
         void solve();
@@ -12,11 +10,12 @@ class Sudoku{
         void Backtracking();
         bool SudokuIsCorrect(int k,int i,int j);
         int GetNextZero(int i,int j);
+        bool Check(int []);
+
+
     private:
-
-    int map[sudoku_size][sudoku_size];
-    int CreatingSudoku[sudoku_size][sudoku_size];
-
+        int map[sudoku_size][sudoku_size];
+        int CreatingSudoku[sudoku_size][sudoku_size];
+        int r[12]={0};
 
     };
-

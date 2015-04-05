@@ -25,7 +25,7 @@ Sudoku::Sudoku(){
 
 void Sudoku::CreateSudoku(){
 
-     for (int i=0;i<sudoku_size;i++){   //原數獨-1
+     for (int i=0;i<sudoku_size;i++){   //计縒-1
         for (int j=0;j<sudoku_size;j++){
             CreatingSudoku[i][j]=init_map[i][j]-1;
             if(CreatingSudoku[i][j]==0)
@@ -37,7 +37,7 @@ void Sudoku::CreateSudoku(){
         }
      }
 
-     srand(time(NULL));   //產生隨機數字>>交換2組
+     srand(time(NULL));   //玻ネ繦诀计>>ユ传2舱
      int a=rand()%9+1,b=rand()%9+1;
      if(a==3)
         a=9;
@@ -70,7 +70,7 @@ void Sudoku::GiveQuestion(){
         for (int j=0;j<sudoku_size;j++)
             map[i][j]=CreatingSudoku[i][j];
 
-    for (int i=0;i<12;i++){         //印出數獨
+    for (int i=0;i<12;i++){         //计縒
         for(int j=0;j<12;j++)
             cout<<map[i][j]<<" ";
         cout<<"\n";
@@ -78,8 +78,8 @@ void Sudoku::GiveQuestion(){
 }
 
 void Sudoku::ReadIn(){
-    Sodoku();   //歸零'
-    for(int i=0;i<12;i++)       //輸入數獨
+    Sodoku();   //耴箂'
+    for(int i=0;i<12;i++)       //块计縒
         for(int j=0;j<12;j++)
             cin<<map[i][j];
 
@@ -98,17 +98,38 @@ void Sudoku::solve(){
         Backtracking(count,i);
 
 
-        //歸零
+        //耴箂
         count=0;
     }
 }
 
 
 
+
 bool Sudoku::SudokuIsCorrect(int k,int i,int j){
+    bool check_result;
+    int check_array[12];
 
 
+    for(int h=0;h<12;h++)
+        check_array[h]=map[i][h];
+    check_array[j]=k;
+    check_result=Check(check_array);
 
+    if (check_result==false)
+        return false;
+
+
+    for(int h=0;h<12;h++)
+        check_array[h]=map[h][j];
+    check_array[i]=k;
+    check_result=Check(check_array);
+
+    if (check_result==false)
+        return false;
+
+
+    return true;
 }
 
 int Sudoku::GetNextZero(int i,int j){
@@ -123,22 +144,39 @@ void Sudoku::Backtracking(int count, int i,int j){
 
     if (count==0)
         return;
-
+    r[count-1]=j;
     j=GetNextZero(i,j);
     if(j==13)
         return;
 
 
-        for(int k=1;k<10;k++){
+        for( k=1;k<10;k++){
             if (SudokuIsCorrect(k,i,j)==true){
                 map[i][j]=k;
-
-                Backtracking(count-1,i,j);
+                count--;
+                Backtracking(count,i,j);
 
             }
+             i=r[count];
         }
 
-
-
 }
+
+
+bool Sudoku::Check(int check_array[]){
+    int count_array[9]={0};
+    for(int i=0;i<12;i++){
+        if(check_array[i]!=-1){
+            count_array[check_array[i]-1]++;
+
+        }
+
+    for(int j=0;j<12;j++)
+        if(ckeck_array[j]==2)
+        return false;
+    }
+
+    return true;
+}
+
 
