@@ -2,25 +2,27 @@
 #include <fstream>
 #include <ctime>
 #include <cstdlib>
-#include "sudoku.h"
+#include "Sudoku.h"
 
 using namespace std;
 
-const int init_map[sudoku_size][sudoku_size]={4,2,6,8,0,3,9,5,1,-1,-1,-1,
-                         0,0,3,9,5,0,6,0,4,-1,-1,-1,
-                         9,0,1,6,2,4,8,0,0,-1,-1,-1,
-                         -1,-1,-1,1,3,2,0,8,7,9,5,0,
-                         -1,-1,-1,0,8,0,1,9,0,4,2,0,
-                         -1,-1,-1,4,9,6,2,3,5,8,0,1,
-                         1,0,0,0,4,0,-1,-1,-1,6,9,5,
-                         0,0,4,0,6,0,-1,-1,-1,1,3,7,
-                         6,9,5,0,1,7,-1,-1,-1,0,8,4,
-                         3,1,2,-1,-1,-1,7,0,4,5,0,9,
-                         7,8,4,-1,-1,-1,0,6,9,3,0,2,
-                         0,6,0,-1,-1,-1,3,1,0,7,0,8};
+const int Sudoku::init_map[sudoku_size][sudoku_size]={{4,2,6,8,0,3,9,5,1,-1,-1,-1},
+                         {0,0,3,9,5,0,6,0,4,-1,-1,-1},
+                         {9,0,1,6,2,4,8,0,0,-1,-1,-1},
+                         {-1,-1,-1,1,3,2,0,8,7,9,5,0},
+                         {-1,-1,-1,0,8,0,1,9,0,4,2,0},
+                         {-1,-1,-1,4,9,6,2,3,5,8,0,1},
+                         {1,0,0,0,4,0,-1,-1,-1,6,9,5},
+                         {0,0,4,0,6,0,-1,-1,-1,1,3,7},
+                         {6,9,5,0,1,7,-1,-1,-1,0,8,4},
+                         {3,1,2,-1,-1,-1,7,0,4,5,0,9},
+                         {7,8,4,-1,-1,-1,0,6,9,3,0,2},
+                         {0,6,0,-1,-1,-1,3,1,0,7,0,8}};
+
 Sudoku::Sudoku(){
     for(int i=0;i<sudoku_size;i++)
-        map[i][j]=0;
+        for(int j=0;j<sudoku_size;j++)
+            map[i][j]=0;
 }
 
 void Sudoku::CreateSudoku(){
@@ -61,9 +63,10 @@ void Sudoku::CreateSudoku(){
      }
 
 }
+}
 
 void Sudoku::GiveQuestion(){
-    Sudoku();
+    //Sudoku();
     CreateSudoku();
 
     for(int i=0;i<sudoku_size;i++)
@@ -81,26 +84,33 @@ void Sudoku::ReadIn(){
     Sodoku();   //耴箂'
     for(int i=0;i<12;i++)       //块计縒
         for(int j=0;j<12;j++)
-            cin<<map[i][j];
+            cin>>map[i][j];
 
 }
 
-void Sudoku::solve(){
+void Sudoku::Solve(){
     int choose[12]={},count=0;
     int i,j;
-    for( i=0;i<12;i++){
-
-        for( j=0;j<12;j++){
+    for( i=0;i<12;i++)
+        for( j=0;j<12;j++)
             if (map[i][j]==0)
                  count++;
+    ans=0;
+    Backtracking(count);
 
+    if (ans==0)
+        cout<<"0"<<endl;
+    if (ans==1){
+        cout<<"1"<<endl;
+        for (int i=0;i<12;i++){
+            for(int j=0;j<12;j++)
+                cout<<map[i][j]<<" ";
+            cout<<"\n";
         }
-        Backtracking(count,i);
-
-
-        //耴箂
-        count=0;
     }
+    if(ans==2)
+        cout<<"2"<<endl;
+
 }
 
 
@@ -140,25 +150,41 @@ int Sudoku::GetNextZero(int i,int j){
     return 13;
 }
 
-void Sudoku::Backtracking(int count, int i,int j){
-
-    if (count==0)
-        return;
-    r[count-1]=j;
-    j=GetNextZero(i,j);
-    if(j==13)
+void Sudoku::Backtracking(int count){
+ if (count==0)
+        ans++;
+    if(ans>=2)
         return;
 
 
-        for( k=1;k<10;k++){
-            if (SudokuIsCorrect(k,i,j)==true){
-                map[i][j]=k;
-                count--;
-                Backtracking(count,i,j);
+    for( a=0;a<12;a++){
+        for( b=0;b<12;b++){
+
+            if(map[a][b]==0){
+                NumberMayBe(a);
+
+                for( c=1;c<10;c++){
+                    if(NumberMayBe_array[c-1]==false){
+                        if (SudokuIsCorrect(c,a,b)==true){
+                            map[a][b]=c;
+                            NumberMayBe_array[c-1]==true;
+                            Backtracking(count-1);
+                        }
+                    }
+
+
+                }
+
 
             }
-             i=r[count];
+
+
+
         }
+    }
+
+
+
 
 }
 
@@ -172,11 +198,18 @@ bool Sudoku::Check(int check_array[]){
         }
 
     for(int j=0;j<12;j++)
-        if(ckeck_array[j]==2)
+        if(check_array[j]>=2)
         return false;
     }
 
     return true;
 }
 
+void Sudoku::NumberMayBe(int i){
+
+    for(int k=0;k<9;k++){
+        NumberMayBe_array[k]=false;
+        NumberMayBe_array[map[i][k]-1]=true;
+    }
+}
 
