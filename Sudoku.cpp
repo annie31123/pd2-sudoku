@@ -81,7 +81,7 @@ void Sudoku::GiveQuestion(){
 }
 
 void Sudoku::ReadIn(){
-    Sodoku();   //耴箂'
+    //Sodoku();   //耴箂'
     for(int i=0;i<12;i++)       //块计縒
         for(int j=0;j<12;j++)
             cin>>map[i][j];
@@ -97,6 +97,12 @@ void Sudoku::Solve(){
                  count++;
     ans=0;
     Backtracking(count);
+
+for (int i=0;i<12;i++){
+            for(int j=0;j<12;j++)
+                cout<<map[i][j]<<" ";
+            cout<<"\n";
+        }
 
     if (ans==0)
         cout<<"0"<<endl;
@@ -118,13 +124,12 @@ void Sudoku::Solve(){
 
 bool Sudoku::SudokuIsCorrect(int k,int i,int j){
     bool check_result;
-    int check_array[12];
-
+    int check_array[12]={0};
 
     for(int h=0;h<12;h++)
         check_array[h]=map[i][h];
-    check_array[j]=k;
-    check_result=Check(check_array);
+   
+    check_result=Check(check_array,c);
 
     if (check_result==false)
         return false;
@@ -132,12 +137,21 @@ bool Sudoku::SudokuIsCorrect(int k,int i,int j){
 
     for(int h=0;h<12;h++)
         check_array[h]=map[h][j];
-    check_array[i]=k;
-    check_result=Check(check_array);
+    
+    check_result=Check(check_array,c);
 
     if (check_result==false)
         return false;
 
+
+    int i1=i%3,j1=j%3;
+    for(int h=0;h<9;h++)
+        check_array[h]=map[i-i1+h/3][j-j1+h%3];
+    check_array[9]=0,check_array[10]=0,check_array[11]=0;
+    check_result=Check(check_array,c);
+
+    if (check_result==false)
+        return false;
 
     return true;
 }
@@ -189,18 +203,19 @@ void Sudoku::Backtracking(int count){
 }
 
 
-bool Sudoku::Check(int check_array[]){
-    int count_array[9]={0};
-    for(int i=0;i<12;i++){
-        if(check_array[i]!=-1){
-            count_array[check_array[i]-1]++;
+bool Sudoku::Check(int check_array[],int c){
+    bool count_array[9];
+    for(int k=0;k<9;k++)
+        count_array[k]=false;
+    for(int k=0;k<12;k++)
+        if(check_array[k]!=0&&check_array[k]!=-1)
+            count_array[check_array[k]-1]=true;
 
-        }
+    
 
-    for(int j=0;j<12;j++)
-        if(check_array[j]>=2)
+    if(count_array[c-1]==true)
         return false;
-    }
+    
 
     return true;
 }

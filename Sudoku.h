@@ -10,7 +10,7 @@ class Sudoku{
         void Backtracking(int count);
         bool SudokuIsCorrect(int k,int i,int j);
         int GetNextZero(int i,int j);
-        bool Check(int []);
+        bool Check(int [],int c);
         void NumberMayBe(int i);
         static const int init_map[sudoku_size][sudoku_size];
 
@@ -22,4 +22,3 @@ class Sudoku{
         bool NumberMayBe_array[9];
 
     };
-
