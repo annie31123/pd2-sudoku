@@ -19,11 +19,7 @@ const int Sudoku::init_map[sudoku_size][sudoku_size]={{4,2,6,8,0,3,9,5,1,-1,-1,-
                          {7,8,4,-1,-1,-1,0,6,9,3,0,2},
                          {0,6,0,-1,-1,-1,3,1,0,7,0,8}};
 
-Sudoku::Sudoku(){
-    for(int i=0;i<sudoku_size;i++)
-        for(int j=0;j<sudoku_size;j++)
-            map[i][j]=0;
-}
+
 
 void Sudoku::CreateSudoku(){
 
@@ -81,7 +77,7 @@ void Sudoku::GiveQuestion(){
 }
 
 void Sudoku::ReadIn(){
-    //Sodoku();   //耴箂'
+    
     for(int i=0;i<12;i++)       //块计縒
         for(int j=0;j<12;j++)
             cin>>map[i][j];
@@ -89,41 +85,55 @@ void Sudoku::ReadIn(){
 }
 
 void Sudoku::Solve(){
-        static int count=0;
+    static int count=0;
     int i,j;
     for( i=0;i<12;i++)
         for( j=0;j<12;j++)
             if (map[i][j]==0)
                  count++;
     
-    int *prob[count];
+	int m=count;
+    int *temp1[m],*temp2[m];
     
     for( i=11;i>-1;i--)
         for( j=11;j>-1;j--)
-            if (map[i][j]==0)
-                prob[count-1]=&map[i][j];count--;
+            if (map[i][j]==0){
+                temp1[m-1]=&map[i][j];
+                 temp2[m-1]=&map[i][j];   
+				*temp1[m-1]=0;
+				*temp2[m-1]=0;
+				m--;
+				}
     
-    ans=0;
-    Backtracking(0,prob,count);
-        for (int i=0;i<12;i++){
-            for(int j=0;j<12;j++)
-                cout<<map[i][j]<<" ";
-            cout<<"\n";
-        }
-    if (ans==0)
-        cout<<"0"<<endl;
-    if (ans==1){
-        cout<<"1"<<endl;
-        for (int i=0;i<12;i++){
-            for(int j=0;j<12;j++)
-                cout<<map[i][j]<<" ";
-            cout<<"\n";
-        }
+   
+    
+	if(Backtracking(0,temp1,count)){
+//cout<<1<<endl;
+		if(ReBacktracking(0,temp2,count)){
+//cout<<2<<endl;
+        	for(i=0;i<count;i++){
+//cout<<3<<endl;
+        		if(*temp1[i]!=*temp2[i]){
+//cout<<4<<endl;
+           			cout<<2<<endl;
+					return;
+				}
+			}
+			cout<<1<<endl;
+			for (int i=0;i<12;i++){
+            	for(int j=0;j<12;j++)
+               		cout<<map[i][j]<<" ";
+            	cout<<endl;
+			return;
+       		 }	
+		}
+			
     }
-    if(ans==2)
-        cout<<"2"<<endl;
-
-
+	else{
+cout<<5<<endl;
+		cout<<0<<endl;
+return;
+}
 }
 
 
@@ -136,7 +146,7 @@ bool Sudoku::SudokuIsCorrect(int c,int* prob[],int m){
     for( a=0;a<12;a++)
         for( b=0;b<12;b++)
             if(&map[a][b]==prob[m])
-                i=a;j=b;
+                {i=a;j=b;/*cout<<a<<"  "<<b<<endl;*/}
     
 
     for(int h=0;h<12;h++)
@@ -170,35 +180,23 @@ bool Sudoku::SudokuIsCorrect(int c,int* prob[],int m){
 }
 
 
-
-int Sudoku::GetNextZero(int i,int j){
-    for(;j<12;j++)
-        if (map[i][j]==0)
-            return j;
-
-    return 13;
-}
-void Sudoku::Backtracking(int m,int *prob[],int count){
+bool Sudoku::Backtracking(int m,int *temp1[],int count){
  if (m==count){
-   for(int i=11;i>-1;i--)
-        for(int j=11;j>-1;j--)
-            if (&map[i][j]==prob[m])
-                map[i][j]=*prob[m];m--;
-	ans++;   
- return;
+    return true;
  }
-   //    ans++;
- //   if(ans>=2)
-   //     return;
             
                 for(int c=1;c<10;c++){
-                    if(*prob[m]==0){
-                        if (SudokuIsCorrect(c,prob,m)==true){
-                            *prob[m]=c;
-                            
-                            Backtracking(m+1,prob,count);
+                    if(*temp1[m]==0){
+ 
+                        if (SudokuIsCorrect(c,temp1,m)==true){
+                            *temp1[m]=c;
+         
+                            if(Backtracking(m+1,temp1,count))
+                                return true;
+                        
+                            *temp1[m]=0;
                         }
-                    
+          
 
 
                 }
@@ -206,14 +204,37 @@ void Sudoku::Backtracking(int m,int *prob[],int count){
 
             }
 
-
-
-        
-
+        return false;
 
 
 
 }
+
+bool Sudoku::ReBacktracking(int m,int *temp2[],int count){
+ if (m==count){
+    return true;
+ }
+            
+                for(int c=9;c>0;c--){
+                    if(*temp2[m]==0){
+ 
+                        if (SudokuIsCorrect(c,temp2,m)==true){
+                            *temp2[m]=c;
+         
+                            if(ReBacktracking(m+1,temp2,count))
+                                return true;
+                        
+                            *temp2[m]=0;
+                        }
+          
+                }
+
+            }
+
+        return false;
+
+}
+
 
 
 bool Sudoku::Check(int check_array[],int c){
@@ -231,12 +252,4 @@ bool Sudoku::Check(int check_array[],int c){
     
 
     return true;
-}
-
-void Sudoku::NumberMayBe(int i){
-
-    for(int k=0;k<9;k++){
-        NumberMayBe_array[k]=false;
-        NumberMayBe_array[map[i][k]-1]=true;
-    }
 }
